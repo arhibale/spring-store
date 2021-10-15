@@ -53,6 +53,18 @@ public class Person {
     public Person() {
     }
 
+    @Override
+    public String toString() {
+        return "Person{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", patronymic='" + patronymic + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
     public UUID getId() {
         return id;
     }

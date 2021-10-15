@@ -14,7 +14,7 @@ public class CartService {
     }
 
     public Cart getCartByPerson(Person person) {
-        return cartRepository.findCartByPerson(person);
+        return cartRepository.findCartByPersonId(person);
     }
 
     public Cart save(Cart cart) {

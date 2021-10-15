@@ -19,4 +19,8 @@ public class PersonService {
         return personRepository.findById(id)
                 .orElseThrow();
     }
+
+    public Person save(Person person) {
+        return personRepository.save(person);
+    }
 }
