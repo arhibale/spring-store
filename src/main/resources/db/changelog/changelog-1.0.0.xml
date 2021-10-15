@@ -61,11 +61,11 @@
             <column name="id" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="created_at" type="timestamp without timezone">
-                <constraints nullable="false"/>
-            </column>
             <column name="person_id" type="uuid">
                 <constraints nullable="false" foreignKeyName="person_id" references="person(id)"/>
+            </column>
+            <column name="created_at" type="timestamp without timezone">
+                <constraints nullable="false"/>
             </column>
             <column name="products" type="jsonb"/>
         </createTable>
@@ -83,10 +83,10 @@
             <column name="person_id" type="uuid">
                 <constraints nullable="false" references="person(id)" foreignKeyName="person_id"/>
             </column>
-            <column name="created_at" type="timestamp without timezone">
+            <column name="address" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="address" type="varchar(1024)">
+            <column name="created_at" type="timestamp without timezone">
                 <constraints nullable="false"/>
             </column>
         </createTable>

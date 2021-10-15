@@ -17,12 +17,12 @@ public class Cart {
     @Id
     private UUID id;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     @ManyToOne
     @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
+    private Person personId;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
     @Type(type = "jsonb")
     @Column(name = "products")
@@ -46,21 +46,21 @@ public class Cart {
         return this;
     }
 
+    public Person getPersonId() {
+        return personId;
+    }
+
+    public Cart setPersonId(Person personId) {
+        this.personId = personId;
+        return this;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public Cart setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-        return this;
-    }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public Cart setPerson(Person personId) {
-        this.person = personId;
         return this;
     }
 

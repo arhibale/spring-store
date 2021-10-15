@@ -13,20 +13,20 @@ public class Order {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cartId;
 
-    @Column(name = "cost")
+    @Column(name = "cost",length = 12, nullable = false)
     private BigDecimal cost;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
-    private Person person;
+    @JoinColumn(name = "created_by", nullable = false)
+    private Person createdBy;
 
-    @Column(name = "address")
+    @Column(name = "address", length = 1024, nullable = false)
     private String address;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     public Order() {
@@ -36,47 +36,53 @@ public class Order {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Order setId(Integer id) {
         this.id = id;
+        return this;
     }
 
-    public Cart getCart() {
-        return cart;
+    public Cart getCartId() {
+        return cartId;
     }
 
-    public void setCart(Cart cart) {
-        this.cart = cart;
+    public Order setCartId(Cart cartId) {
+        this.cartId = cartId;
+        return this;
     }
 
     public BigDecimal getCost() {
         return cost;
     }
 
-    public void setCost(BigDecimal cost) {
+    public Order setCost(BigDecimal cost) {
         this.cost = cost;
+        return this;
     }
 
-    public Person getPerson() {
-        return person;
+    public Person getCreatedBy() {
+        return createdBy;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public Order setCreatedBy(Person createdBy) {
+        this.createdBy = createdBy;
+        return this;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public Order setAddress(String address) {
         this.address = address;
+        return this;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public Order setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 }

@@ -56,7 +56,7 @@ public class MainView extends VerticalLayout {
                 innerProducts.add(innerProduct);
             }
             cart.setProducts(innerProducts);
-            cart.setPerson(new Person().setId(UUID.fromString("e458d0f5-f717-42ea-ad11-f82d770ea6e0")));
+            cart.setPersonId(new Person().setId(UUID.fromString("e458d0f5-f717-42ea-ad11-f82d770ea6e0")));
             cart.setId(UUID.fromString("68d364da-31a4-47d1-8c79-f6b84dcc97f3"));
             cart.setCreatedAt(LocalDateTime.now());
             cartService.save(cart);
