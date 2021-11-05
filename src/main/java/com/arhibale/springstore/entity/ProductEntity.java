@@ -7,22 +7,23 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "product")
-public class Product {
+public class ProductEntity {
     @Id
+    @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name", length = 128)
+    @Column(name = "name", length = 128, nullable = false)
     private String name;
 
-    @Column(name = "price", length = 8)
+    @Column(name = "price", length = 8, nullable = false)
     private BigDecimal price;
 
     @Column(name = "count")
-    private int count;
+    private Integer count;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
-    private Person createdBy;
+    private PersonEntity createdBy;
 
     @Column(name = "vendor_code", length = 64, nullable = false)
     private String vendorCode;
@@ -32,26 +33,17 @@ public class Product {
 
     @PrePersist
     public void init() {
-        if(this.id == null) {
+        if (this.id == null) {
             this.id = UUID.randomUUID();
         }
-
         this.createdAt = LocalDateTime.now();
-    }
-
-    public void incrementCount() {
-        this.count++;
-    }
-
-    public void decreaseCount() {
-        this.count--;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public Product setId(UUID id) {
+    public ProductEntity setId(UUID id) {
         this.id = id;
         return this;
     }
@@ -60,7 +52,7 @@ public class Product {
         return name;
     }
 
-    public Product setName(String name) {
+    public ProductEntity setName(String name) {
         this.name = name;
         return this;
     }
@@ -69,25 +61,25 @@ public class Product {
         return price;
     }
 
-    public Product setPrice(BigDecimal price) {
+    public ProductEntity setPrice(BigDecimal price) {
         this.price = price;
         return this;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public Product setCount(int count) {
+    public ProductEntity setCount(Integer count) {
         this.count = count;
         return this;
     }
 
-    public Person getCreatedBy() {
+    public PersonEntity getCreatedBy() {
         return createdBy;
     }
 
-    public Product setCreatedBy(Person createdBy) {
+    public ProductEntity setCreatedBy(PersonEntity createdBy) {
         this.createdBy = createdBy;
         return this;
     }
@@ -96,7 +88,7 @@ public class Product {
         return vendorCode;
     }
 
-    public Product setVendorCode(String vendorCode) {
+    public ProductEntity setVendorCode(String vendorCode) {
         this.vendorCode = vendorCode;
         return this;
     }
@@ -105,7 +97,7 @@ public class Product {
         return createdAt;
     }
 
-    public Product setCreatedAt(LocalDateTime createdAt) {
+    public ProductEntity setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "category")
-public class Category {
+public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -17,9 +17,6 @@ public class Category {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public Category() {
-    }
-
     @PrePersist
     public void init() {
         this.createdAt = LocalDateTime.now();
@@ -29,7 +26,7 @@ public class Category {
         return id;
     }
 
-    public Category setId(Integer id) {
+    public CategoryEntity setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -38,7 +35,7 @@ public class Category {
         return name;
     }
 
-    public Category setName(String name) {
+    public CategoryEntity setName(String name) {
         this.name = name;
         return this;
     }
@@ -47,7 +44,7 @@ public class Category {
         return createdAt;
     }
 
-    public Category setCreatedAt(LocalDateTime createdAt) {
+    public CategoryEntity setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }

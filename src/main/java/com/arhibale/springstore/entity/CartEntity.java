@@ -12,14 +12,16 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "cart")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Cart {
+public class CartEntity {
     @Id
+    @Column(name = "id")
     private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "person_id", nullable = false)
-    private Person personId;
+    private PersonEntity personId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -30,10 +32,9 @@ public class Cart {
 
     @PrePersist
     public void init() {
-        if(this.id == null) {
+        if (this.id == null) {
             this.id = UUID.randomUUID();
         }
-
         this.createdAt = LocalDateTime.now();
     }
 
@@ -41,16 +42,16 @@ public class Cart {
         return id;
     }
 
-    public Cart setId(UUID id) {
+    public CartEntity setId(UUID id) {
         this.id = id;
         return this;
     }
 
-    public Person getPersonId() {
+    public PersonEntity getPersonId() {
         return personId;
     }
 
-    public Cart setPersonId(Person personId) {
+    public CartEntity setPersonId(PersonEntity personId) {
         this.personId = personId;
         return this;
     }
@@ -59,7 +60,7 @@ public class Cart {
         return createdAt;
     }
 
-    public Cart setCreatedAt(LocalDateTime createdAt) {
+    public CartEntity setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }
@@ -68,7 +69,7 @@ public class Cart {
         return products;
     }
 
-    public Cart setProducts(List<InnerProduct> products) {
+    public CartEntity setProducts(List<InnerProduct> products) {
         this.products = products;
         return this;
     }
@@ -76,7 +77,7 @@ public class Cart {
     public static class InnerProduct implements Serializable {
         private String id;
         private String name;
-        private long count;
+        private Integer count;
         private BigDecimal price;
         private String vendorCode;
 
@@ -98,11 +99,11 @@ public class Cart {
             return this;
         }
 
-        public long getCount() {
+        public Integer getCount() {
             return count;
         }
 
-        public InnerProduct setCount(long count) {
+        public InnerProduct setCount(Integer count) {
             this.count = count;
             return this;
         }

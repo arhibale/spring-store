@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/spring_shop
+    url: jdbc:postgresql://localhost:5432/spring_store
     username: postgres
     password: DZXdR8Vqc6
   liquibase:

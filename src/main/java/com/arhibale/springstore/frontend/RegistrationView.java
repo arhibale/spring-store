@@ -1,27 +1,23 @@
 package com.arhibale.springstore.frontend;
 
-import com.arhibale.springstore.entity.Person;
+import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.service.PersonService;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
-import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.EmailValidator;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-@Route("reg")
+@Route("registration")
+@PageTitle("Registration")
 public class RegistrationView extends VerticalLayout {
 
     private final PersonService personService;
@@ -29,96 +25,90 @@ public class RegistrationView extends VerticalLayout {
     public RegistrationView(PersonService personService) {
         this.personService = personService;
 
-        initPage();
+        initRegistrationView();
     }
 
-    private void initPage() {
+    private void initRegistrationView() {
+        setSizeFull();
+        setAlignItems(Alignment.CENTER);
+        setJustifyContentMode(JustifyContentMode.CENTER);
+
+        var firstNameTextField = new TextField("Имя");
+        var lastNameTextField = new TextField("Фамилия");
+        var patronymicTextField = new TextField("Отчество");
+        var phoneTextField = new TextField("Номер телефона");
+        var addressTextField = new TextField("Адрес");
+        var emailTextField = new EmailField("E-mail");
+        var loginTextField = new TextField("Логин");
+        var passwordTextField = new PasswordField("Пароль");
+
         FormLayout formLayout = new FormLayout();
-        Binder<Person> binder = new Binder<>();
-
-        TextField firstName = new TextField();
-        firstName.setValueChangeMode(ValueChangeMode.EAGER);
-        TextField lastName = new TextField();
-        lastName.setValueChangeMode(ValueChangeMode.EAGER);
-        TextField patronymic = new TextField();
-        patronymic.setValueChangeMode(ValueChangeMode.EAGER);
-        TextField phone = new TextField();
-        phone.setValueChangeMode(ValueChangeMode.EAGER);
-        TextField address = new TextField();
-        address.setValueChangeMode(ValueChangeMode.EAGER);
-        EmailField email = new EmailField();
-        email.setValueChangeMode(ValueChangeMode.EAGER);
-        PasswordField password = new PasswordField();
-        password.setValueChangeMode(ValueChangeMode.EAGER);
-
-        formLayout.addFormItem(firstName, "First Name");
-        formLayout.addFormItem(lastName, "Last Name");
-        formLayout.addFormItem(patronymic, "Patronymic");
-        formLayout.addFormItem(phone, "Phone");
-        formLayout.addFormItem(address, "Address");
-        formLayout.addFormItem(email, "E-mail");
-        formLayout.addFormItem(password, "Password");
-
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        Button save = new Button("Save");
-        Button reset = new Button("Reset");
-        horizontalLayout.add(save, reset);
+        formLayout.add(firstNameTextField, lastNameTextField, patronymicTextField, phoneTextField, emailTextField, addressTextField, loginTextField, passwordTextField);
+        formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("500px", 2));
+        formLayout.setColspan(patronymicTextField, 2);
+        formLayout.setColspan(addressTextField, 2);
+        formLayout.setMaxWidth(500f, Unit.PIXELS);
 
         SerializablePredicate<String> predicate = value ->
-                !lastName.getValue().trim().isEmpty()
-                || !phone.getValue().trim().isEmpty()
-                || !password.getValue().trim().isEmpty();
+                        !firstNameTextField.getValue().trim().isEmpty() ||
+                        !lastNameTextField.getValue().trim().isEmpty() ||
+                        !patronymicTextField.getValue().trim().isEmpty() ||
+                        !phoneTextField.getValue().trim().isEmpty() ||
+                        !addressTextField.getValue().isEmpty() ||
+                        !emailTextField.getValue().trim().isEmpty() ||
+                        !loginTextField.getValue().trim().isEmpty() ||
+                        !passwordTextField.getValue().trim().isEmpty();
 
-        Binder.Binding<Person, String> lastNameBinding = binder.forField(lastName)
-                        .withValidator(predicate, "Please specify your last name")
-                        .bind(Person::getLastName, Person::setLastName);
-        Binder.Binding<Person, String> emailBinding = binder.forField(email)
-                        .withNullRepresentation("")
-                        .withValidator(predicate, "Please specify your email")
-                        .withValidator(new EmailValidator("Incorrect email address"))
-                        .bind(Person::getEmail, Person::setEmail);
-        Binder.Binding<Person, String> phoneBinding = binder.forField(phone)
-                        .withValidator(predicate, "Please specify your phone")
-                        .bind(Person::getPhone, Person::setPhone);
+        Binder<PersonEntity> binder = new Binder<>();
 
-        lastName.addValueChangeListener(event -> {
-            emailBinding.validate();
-            phoneBinding.validate();
-        });
+        Binder.Binding<PersonEntity, String> firstNameBinding = binder.forField(firstNameTextField)
+                .withValidator(predicate, "Пустое имя!")
+                .withValidator(firstName -> firstName.matches("[а-яА-ЯЁё]{1,128}+"), "Неккоректное имя!")
+                .bind(PersonEntity::getFirstName, PersonEntity::setFirstName);
+        Binder.Binding<PersonEntity, String> lastNameBinding = binder.forField(lastNameTextField)
+                .withValidator(predicate, "Пустая фамилия!")
+                .withValidator(lastName -> lastName.matches("[а-яА-ЯЁё]{1,128}+"), "Неккоректная фамилия!")
+                .bind(PersonEntity::getLastName, PersonEntity::setLastName);
+        Binder.Binding<PersonEntity, String> patronymicBinding = binder.forField(patronymicTextField)
+                .withValidator(predicate, "Пустое отчество!")
+                .withValidator(patronymic -> patronymic.matches("[а-яА-ЯЁё]{1,128}+"), "Неккоректное отчество!")
+                .bind(PersonEntity::getPatronymic, PersonEntity::setPatronymic);
+        Binder.Binding<PersonEntity, String> phoneBinding = binder.forField(phoneTextField)
+                .withValidator(predicate, "Пустой номер телефона!")
+                .withValidator(phone -> phone.matches("\\d{11,14}+"), "Неккоректный номер телефона!")
+                .bind(PersonEntity::getPhone, PersonEntity::setPhone);
+        Binder.Binding<PersonEntity, String> addressBinding = binder.forField(addressTextField)
+                .withValidator(predicate, "Пустой адрес!")
+                .withValidator(address -> address.matches(".{1,1024}+"), "Слишком большой или короткий адрес!")
+                .bind(PersonEntity::getAddress, PersonEntity::setAddress);
+        Binder.Binding<PersonEntity, String> emailBinding = binder.forField(emailTextField)
+                .withNullRepresentation("")
+                .withValidator(predicate, "Нустой e-mail!")
+                .withValidator(new EmailValidator("Неккоректный e-mail!"))
+                .bind(PersonEntity::getEmail, PersonEntity::setEmail);
+        Binder.Binding<PersonEntity, String> loginBinding = binder.forField(loginTextField)
+                .withValidator(predicate, "Пустой логин!")
+                .withValidator(login -> login.matches("[a-zA-Z0-9]{1,256}+"), "Неккоректный логин!")
+                .bind(PersonEntity::getLogin, PersonEntity::setLogin);
+        Binder.Binding<PersonEntity, String> passwordBinding = binder.forField(passwordTextField)
+                .withValidator(predicate, "Пустой пароль!")
+                .withValidator(password -> password.matches("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,256}+"),
+                        "Пароль должен содержать по крайней мере одну цифру и одну прописную и строчную букву, а также не менее 8 или более символов!")
+                .bind(PersonEntity::getPassword, PersonEntity::setPassword);
 
-        email.addValueChangeListener(event -> {
-            lastNameBinding.validate();
-            phoneBinding.validate();
-        });
+        Button registration = new Button("Регистрация");
 
-        phone.addValueChangeListener(event -> {
-            lastNameBinding.validate();
-            emailBinding.validate();
-        });
-
-        Person person = new Person();
-        Label infoLabel = new Label();
-
-        save.addClickListener(event -> {
+        registration.addClickListener(buttonClickEvent -> {
+            PersonEntity person = new PersonEntity();
             if (binder.writeBeanIfValid(person)) {
+                person.setRole("CUSTOMER");
                 personService.save(person);
-                infoLabel.setText("Saved bean values: " + person);
+                Notification.show("Регистрация прошла успешно!");
             } else {
-                BinderValidationStatus<Person> validate = binder.validate();
-                String errorText = validate.getFieldValidationStatuses().stream()
-                        .filter(BindingValidationStatus::isError)
-                        .map(BindingValidationStatus::getMessage)
-                        .map(Optional::get).distinct()
-                        .collect(Collectors.joining(", "));
-                infoLabel.setText("There are errors: " + errorText);
+                Notification.show("Есть незаполненные поля!");
             }
         });
 
-        reset.addClickListener(event -> {
-            binder.readBean(null);
-            infoLabel.setText("");
-        });
-
-        add(formLayout, horizontalLayout, infoLabel);
+        add(formLayout, registration);
     }
 }

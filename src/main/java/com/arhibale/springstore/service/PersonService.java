@@ -1,10 +1,8 @@
 package com.arhibale.springstore.service;
 
-import com.arhibale.springstore.entity.Person;
+import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.repository.PersonRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class PersonService {
@@ -15,12 +13,7 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
-    public Person getPersonById(UUID id) {
-        return personRepository.findById(id)
-                .orElseThrow();
-    }
-
-    public Person save(Person person) {
+    public PersonEntity save(PersonEntity person) {
         return personRepository.save(person);
     }
 }

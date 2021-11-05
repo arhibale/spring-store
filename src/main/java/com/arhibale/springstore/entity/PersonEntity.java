@@ -7,11 +7,12 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "person")
-public class Person {
+public class PersonEntity {
     @Id
+    @Column(name = "id")
     private UUID id;
 
-    @Column(name = "first_name", length = 128)
+    @Column(name = "first_name", length = 128, nullable = false)
     private String firstName;
 
     @Column(name = "last_name", length = 128, nullable = false)
@@ -20,7 +21,7 @@ public class Person {
     @Column(name = "patronymic", length = 128)
     private String patronymic;
 
-    @Column(name = "phone", length = 14, nullable = false)
+    @Column(name = "phone", length = 16, nullable = false)
     private String phone;
 
     @Column(name = "address", length = 1024)
@@ -32,10 +33,13 @@ public class Person {
     @Column(name = "role", length = 16)
     private String role;
 
-    @Column(name = "email", length = 256)
+    @Column(name = "email", length = 256, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", length = 128, nullable = false)
+    @Column(name = "login", length = 256, nullable = false, unique = true)
+    private String login;
+
+    @Column(name = "password", length = 256, nullable = false)
     private String password;
 
     @Column(name = "created_at", nullable = false)
@@ -43,33 +47,17 @@ public class Person {
 
     @PrePersist
     public void init() {
-        if(this.id == null) {
+        if (this.id == null) {
             this.id = UUID.randomUUID();
         }
-
         this.createdAt = LocalDateTime.now();
-    }
-
-    public Person() {
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", patronymic='" + patronymic + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 
     public UUID getId() {
         return id;
     }
 
-    public Person setId(UUID id) {
+    public PersonEntity setId(UUID id) {
         this.id = id;
         return this;
     }
@@ -78,7 +66,7 @@ public class Person {
         return firstName;
     }
 
-    public Person setFirstName(String firstName) {
+    public PersonEntity setFirstName(String firstName) {
         this.firstName = firstName;
         return this;
     }
@@ -87,7 +75,7 @@ public class Person {
         return lastName;
     }
 
-    public Person setLastName(String lastName) {
+    public PersonEntity setLastName(String lastName) {
         this.lastName = lastName;
         return this;
     }
@@ -96,7 +84,7 @@ public class Person {
         return patronymic;
     }
 
-    public Person setPatronymic(String patronymic) {
+    public PersonEntity setPatronymic(String patronymic) {
         this.patronymic = patronymic;
         return this;
     }
@@ -105,7 +93,7 @@ public class Person {
         return phone;
     }
 
-    public Person setPhone(String phone) {
+    public PersonEntity setPhone(String phone) {
         this.phone = phone;
         return this;
     }
@@ -114,7 +102,7 @@ public class Person {
         return address;
     }
 
-    public Person setAddress(String address) {
+    public PersonEntity setAddress(String address) {
         this.address = address;
         return this;
     }
@@ -123,7 +111,7 @@ public class Person {
         return balance;
     }
 
-    public Person setBalance(BigDecimal balance) {
+    public PersonEntity setBalance(BigDecimal balance) {
         this.balance = balance;
         return this;
     }
@@ -132,7 +120,7 @@ public class Person {
         return role;
     }
 
-    public Person setRole(String role) {
+    public PersonEntity setRole(String role) {
         this.role = role;
         return this;
     }
@@ -141,8 +129,17 @@ public class Person {
         return email;
     }
 
-    public Person setEmail(String email) {
+    public PersonEntity setEmail(String email) {
         this.email = email;
+        return this;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public PersonEntity setLogin(String login) {
+        this.login = login;
         return this;
     }
 
@@ -150,7 +147,7 @@ public class Person {
         return password;
     }
 
-    public Person setPassword(String password) {
+    public PersonEntity setPassword(String password) {
         this.password = password;
         return this;
     }
@@ -159,7 +156,7 @@ public class Person {
         return createdAt;
     }
 
-    public Person setCreatedAt(LocalDateTime createdAt) {
+    public PersonEntity setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }

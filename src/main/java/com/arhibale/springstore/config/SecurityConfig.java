@@ -1,4 +1,4 @@
-package com.arhibale.springstore.config.security;
+package com.arhibale.springstore.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
