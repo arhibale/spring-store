@@ -2,9 +2,11 @@ package com.arhibale.springstore.frontend;
 
 import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.service.PersonService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -17,7 +19,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route("registration")
-@PageTitle("Registration")
+@PageTitle("Регистрация")
 public class RegistrationView extends VerticalLayout {
 
     private final PersonService personService;
@@ -42,7 +44,7 @@ public class RegistrationView extends VerticalLayout {
         var loginTextField = new TextField("Логин");
         var passwordTextField = new PasswordField("Пароль");
 
-        FormLayout formLayout = new FormLayout();
+        var formLayout = new FormLayout();
         formLayout.add(firstNameTextField, lastNameTextField, patronymicTextField, phoneTextField, emailTextField, addressTextField, loginTextField, passwordTextField);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("500px", 2));
         formLayout.setColspan(patronymicTextField, 2);
@@ -96,19 +98,20 @@ public class RegistrationView extends VerticalLayout {
                         "Пароль должен содержать по крайней мере одну цифру и одну прописную и строчную букву, а также не менее 8 или более символов!")
                 .bind(PersonEntity::getPassword, PersonEntity::setPassword);
 
-        Button registration = new Button("Регистрация");
+        var registrationButton = new Button("Регистрация");
 
-        registration.addClickListener(buttonClickEvent -> {
-            PersonEntity person = new PersonEntity();
+        registrationButton.addClickListener(buttonClickEvent -> {
+            var person = new PersonEntity();
             if (binder.writeBeanIfValid(person)) {
                 person.setRole("CUSTOMER");
                 personService.save(person);
                 Notification.show("Регистрация прошла успешно!");
+                UI.getCurrent().navigate(LoginView.class);
             } else {
                 Notification.show("Есть незаполненные поля!");
             }
         });
 
-        add(formLayout, registration);
+        add(new H1("Регистрация"), formLayout, registrationButton);
     }
 }

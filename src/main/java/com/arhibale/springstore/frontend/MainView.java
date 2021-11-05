@@ -21,7 +21,7 @@ public class MainView extends VerticalLayout {
     }
 
     private HorizontalLayout initCartButton() {
-        var toRegistrationButton = new Button("Registration", event -> UI.getCurrent().navigate("registration"));
+        var toRegistrationButton = new Button("Registration", event -> UI.getCurrent().navigate(RegistrationView.class));
         return new HorizontalLayout(toRegistrationButton);
     }
 }
