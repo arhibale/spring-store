@@ -104,4 +104,12 @@
             </column>
         </createTable>
     </changeSet>
+    
+    <changeSet id="add-keycloak-id-to-person" author="arhibale">
+        <addColumn tableName="person">
+            <column name="keycloak_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

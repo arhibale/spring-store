@@ -5,3 +5,14 @@ spring:
     password: DZXdR8Vqc6
   liquibase:
     change-log: classpath:db/changelog-master.xml
+  keycloak:
+    client-id: admin-cli
+    service-login: admin
+    service-password: admin
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:8080/auth/realms/master
+server:
+  port: 8090

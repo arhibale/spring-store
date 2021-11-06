@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PersonRepository extends CrudRepository<PersonEntity, UUID> {
-    Optional<PersonEntity> findByLogin(String login);
+    Optional<PersonEntity> findByKeycloakId(UUID keycloakId);
 }

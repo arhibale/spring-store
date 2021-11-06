@@ -63,36 +63,35 @@ public class RegistrationView extends VerticalLayout {
 
         Binder<PersonEntity> binder = new Binder<>();
 
-        Binder.Binding<PersonEntity, String> firstNameBinding = binder.forField(firstNameTextField)
+        binder.forField(firstNameTextField)
                 .withValidator(predicate, "Пустое имя!")
                 .withValidator(firstName -> firstName.matches("[а-яА-ЯЁё]{1,128}+"), "Неккоректное имя!")
                 .bind(PersonEntity::getFirstName, PersonEntity::setFirstName);
-        Binder.Binding<PersonEntity, String> lastNameBinding = binder.forField(lastNameTextField)
+        binder.forField(lastNameTextField)
                 .withValidator(predicate, "Пустая фамилия!")
                 .withValidator(lastName -> lastName.matches("[а-яА-ЯЁё]{1,128}+"), "Неккоректная фамилия!")
                 .bind(PersonEntity::getLastName, PersonEntity::setLastName);
-        Binder.Binding<PersonEntity, String> patronymicBinding = binder.forField(patronymicTextField)
+        binder.forField(patronymicTextField)
                 .withValidator(predicate, "Пустое отчество!")
                 .withValidator(patronymic -> patronymic.matches("[а-яА-ЯЁё]{1,128}+"), "Неккоректное отчество!")
                 .bind(PersonEntity::getPatronymic, PersonEntity::setPatronymic);
-        Binder.Binding<PersonEntity, String> phoneBinding = binder.forField(phoneTextField)
+        binder.forField(phoneTextField)
                 .withValidator(predicate, "Пустой номер телефона!")
                 .withValidator(phone -> phone.matches("\\d{11,14}+"), "Неккоректный номер телефона!")
                 .bind(PersonEntity::getPhone, PersonEntity::setPhone);
-        Binder.Binding<PersonEntity, String> addressBinding = binder.forField(addressTextField)
+        binder.forField(addressTextField)
                 .withValidator(predicate, "Пустой адрес!")
                 .withValidator(address -> address.matches(".{1,1024}+"), "Слишком большой или короткий адрес!")
                 .bind(PersonEntity::getAddress, PersonEntity::setAddress);
-        Binder.Binding<PersonEntity, String> emailBinding = binder.forField(emailTextField)
-                .withNullRepresentation("")
+        binder.forField(emailTextField)
                 .withValidator(predicate, "Нустой e-mail!")
                 .withValidator(new EmailValidator("Неккоректный e-mail!"))
                 .bind(PersonEntity::getEmail, PersonEntity::setEmail);
-        Binder.Binding<PersonEntity, String> loginBinding = binder.forField(loginTextField)
+        binder.forField(loginTextField)
                 .withValidator(predicate, "Пустой логин!")
                 .withValidator(login -> login.matches("[a-zA-Z0-9]{1,256}+"), "Неккоректный логин!")
                 .bind(PersonEntity::getLogin, PersonEntity::setLogin);
-        Binder.Binding<PersonEntity, String> passwordBinding = binder.forField(passwordTextField)
+        binder.forField(passwordTextField)
                 .withValidator(predicate, "Пустой пароль!")
                 .withValidator(password -> password.matches("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,256}+"),
                         "Пароль должен содержать по крайней мере одну цифру и одну прописную и строчную букву, а также не менее 8 или более символов!")
@@ -101,14 +100,19 @@ public class RegistrationView extends VerticalLayout {
         var registrationButton = new Button("Регистрация");
 
         registrationButton.addClickListener(buttonClickEvent -> {
-            var person = new PersonEntity();
-            if (binder.writeBeanIfValid(person)) {
-                person.setRole("CUSTOMER");
-                personService.save(person);
-                Notification.show("Регистрация прошла успешно!");
-                UI.getCurrent().navigate(LoginView.class);
-            } else {
-                Notification.show("Есть незаполненные поля!");
+            try {
+                var person = new PersonEntity();
+                if (binder.writeBeanIfValid(person)) {
+                    person.setRole("CUSTOMER");
+                    personService.save(person);
+                    Notification.show("Регистрация прошла успешно!");
+                    UI.getCurrent().navigate(LoginView.class);
+                } else {
+                    Notification.show("Есть незаполненные поля!");
+                }
+            } catch (Exception e) {
+                binder.readBean(null);
+                Notification.show("Произошла ошибка!");
             }
         });
 

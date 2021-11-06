@@ -17,6 +17,7 @@ public class SecurityUtils {
 
         return authentication != null
                 && !(authentication instanceof AnonymousAuthenticationToken)
+                && ((CustomUserDetails) authentication.getDetails()).isCredentialsNonExpired()
                 && authentication.isAuthenticated();
     }
 }

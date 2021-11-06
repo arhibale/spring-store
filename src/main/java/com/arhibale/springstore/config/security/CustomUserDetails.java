@@ -1,10 +1,12 @@
 package com.arhibale.springstore.config.security;
 
 import com.arhibale.springstore.entity.PersonEntity;
+import com.arhibale.springstore.util.DecodeJwtToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,7 +46,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        int exp = (int) DecodeJwtToken.decode("exp");
+        long now = Instant.now().toEpochMilli() / 1000;
+        return exp > now;
     }
 
     @Override

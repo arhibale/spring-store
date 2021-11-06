@@ -29,7 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login").permitAll()
                 .loginProcessingUrl("/login")
                 .failureUrl("/login?error")
-                .and().logout().logoutSuccessUrl("/login");
+                .and().logout().logoutSuccessUrl("/login")
+                .and().oauth2ResourceServer().jwt();
     }
 
     @Override

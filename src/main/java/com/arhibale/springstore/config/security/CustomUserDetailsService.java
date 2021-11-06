@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
     private final PersonService personService;
@@ -16,8 +18,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        PersonEntity person = personService.findByLogin(login);
+    public UserDetails loadUserByUsername(String keycloakId) throws UsernameNotFoundException {
+        PersonEntity person = personService.findByKeycloakId(UUID.fromString(keycloakId));
         return new CustomUserDetails(person);
     }
 }

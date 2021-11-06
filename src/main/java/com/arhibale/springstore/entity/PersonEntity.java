@@ -45,6 +45,9 @@ public class PersonEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "keycloak_id", nullable = false)
+    private UUID keycloakId;
+
     @PrePersist
     public void init() {
         if (this.id == null) {
@@ -158,6 +161,15 @@ public class PersonEntity {
 
     public PersonEntity setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+        return this;
+    }
+
+    public UUID getKeycloakId() {
+        return keycloakId;
+    }
+
+    public PersonEntity setKeycloakId(UUID keycloakId) {
+        this.keycloakId = keycloakId;
         return this;
     }
 }
