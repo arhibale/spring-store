@@ -3,7 +3,6 @@ package com.arhibale.springstore.config.security;
 import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.util.DecodeJwtToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
@@ -16,7 +15,7 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(PersonEntity person) {
         this.person = person;
-        this.authorities = List.of(new SimpleGrantedAuthority(person.getRole()));
+        this.authorities = DecodeJwtToken.getRoles();
     }
 
     @Override
@@ -46,7 +45,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        int exp = (int) DecodeJwtToken.decode("exp");
+        int exp = (int) DecodeJwtToken.decodeByKey("exp");
         long now = Instant.now().toEpochMilli() / 1000;
         return exp > now;
     }
@@ -54,5 +53,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public PersonEntity getPerson() {
+        return person;
     }
 }

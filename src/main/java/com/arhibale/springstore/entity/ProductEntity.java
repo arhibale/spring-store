@@ -1,5 +1,8 @@
 package com.arhibale.springstore.entity;
 
+import com.arhibale.springstore.config.security.CustomUserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,6 +40,7 @@ public class ProductEntity {
             this.id = UUID.randomUUID();
         }
         this.createdAt = LocalDateTime.now();
+        this.createdBy = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPerson();
     }
 
     public UUID getId() {

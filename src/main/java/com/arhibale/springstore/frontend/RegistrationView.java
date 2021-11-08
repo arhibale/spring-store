@@ -8,7 +8,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -20,7 +20,7 @@ import com.vaadin.flow.router.Route;
 
 @Route("registration")
 @PageTitle("Регистрация")
-public class RegistrationView extends VerticalLayout {
+public class RegistrationView extends AbstractView {
 
     private final PersonService personService;
 
@@ -31,10 +31,6 @@ public class RegistrationView extends VerticalLayout {
     }
 
     private void initRegistrationView() {
-        setSizeFull();
-        setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.CENTER);
-
         var firstNameTextField = new TextField("Имя");
         var lastNameTextField = new TextField("Фамилия");
         var patronymicTextField = new TextField("Отчество");
@@ -97,13 +93,11 @@ public class RegistrationView extends VerticalLayout {
                         "Пароль должен содержать по крайней мере одну цифру и одну прописную и строчную букву, а также не менее 8 или более символов!")
                 .bind(PersonEntity::getPassword, PersonEntity::setPassword);
 
-        var registrationButton = new Button("Регистрация");
-
-        registrationButton.addClickListener(buttonClickEvent -> {
+        var registrationButton = new Button("Регистрация" , buttonClickEvent -> {
             try {
                 var person = new PersonEntity();
                 if (binder.writeBeanIfValid(person)) {
-                    person.setRole("CUSTOMER");
+                    person.setRole("customer");
                     personService.save(person);
                     Notification.show("Регистрация прошла успешно!");
                     UI.getCurrent().navigate(LoginView.class);
@@ -111,11 +105,11 @@ public class RegistrationView extends VerticalLayout {
                     Notification.show("Есть незаполненные поля!");
                 }
             } catch (Exception e) {
-                binder.readBean(null);
+                e.printStackTrace();
                 Notification.show("Произошла ошибка!");
             }
         });
 
-        add(new H1("Регистрация"), formLayout, registrationButton);
+        add(new H1("Регистрация"), new HorizontalLayout(formLayout), registrationButton);
     }
 }

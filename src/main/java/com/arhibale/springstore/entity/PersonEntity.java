@@ -48,6 +48,9 @@ public class PersonEntity {
     @Column(name = "keycloak_id", nullable = false)
     private UUID keycloakId;
 
+    @Column(name = "is_disabled", nullable = false)
+    private boolean isDisabled;
+
     @PrePersist
     public void init() {
         if (this.id == null) {
@@ -170,6 +173,15 @@ public class PersonEntity {
 
     public PersonEntity setKeycloakId(UUID keycloakId) {
         this.keycloakId = keycloakId;
+        return this;
+    }
+
+    public boolean isDisabled() {
+        return isDisabled;
+    }
+
+    public PersonEntity setDisabled(boolean disabled) {
+        isDisabled = disabled;
         return this;
     }
 }

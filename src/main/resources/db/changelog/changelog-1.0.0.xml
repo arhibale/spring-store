@@ -110,6 +110,13 @@
             <column name="keycloak_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
+            <column name="is_disabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="price-to-mumeric" author="arhibale">
+        <modifyDataType tableName="product" columnName="price" newDataType="numeric(10,2)"/>
     </changeSet>
 </databaseChangeLog>

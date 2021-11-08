@@ -9,16 +9,16 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.BearerTokenAuthenticationToken;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Route("login")
 @PageTitle("Авторизация")
@@ -58,7 +58,17 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
             securityContext.setAuthentication(tokenAuthentication);
 
-            var customDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername((String) DecodeJwtToken.decode("sub"));
+            var customDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername((String) DecodeJwtToken.decodeByKey("sub"));
+
+            if (customDetails.getPerson().isDisabled()) {
+                Map<String, List<String>> queryParams = new HashMap<>();
+                queryParams.put("error", List.of(""));
+                var queryParameters = new QueryParameters(queryParams);
+                UI.getCurrent().navigate("login", queryParameters);
+                SecurityContextHolder.clearContext();
+                return;
+            }
+
             tokenAuthentication.setDetails(customDetails);
 
             UI.getCurrent().navigate(MainView.class);

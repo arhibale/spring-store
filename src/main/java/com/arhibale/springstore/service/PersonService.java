@@ -5,9 +5,13 @@ import com.arhibale.springstore.exception.PersonNotFoundException;
 import com.arhibale.springstore.integration.KeycloakIntegration;
 import com.arhibale.springstore.repository.PersonRepository;
 import com.arhibale.springstore.util.DecodeJwtToken;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,16 +27,35 @@ public class PersonService {
         this.keycloakIntegration = keycloakIntegration;
     }
 
-
+    @Transactional(rollbackOn = Exception.class)
     public PersonEntity save(PersonEntity person) {
         keycloakIntegration.createUser(person);
         person.setPassword(passwordEncoder.encode(person.getPassword()));
-        person.setKeycloakId(UUID.fromString((String) DecodeJwtToken.decode("sub")));
+        person.setKeycloakId(UUID.fromString((String) DecodeJwtToken.decodeByKey("sub")));
         return personRepository.save(person);
     }
 
     public PersonEntity findByKeycloakId(UUID keycloakId) {
         return personRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new PersonNotFoundException("Пользователь с таким id не найден: " + keycloakId));
+                .orElseThrow(() -> new PersonNotFoundException("Пользователь с таким keycloak id не найден: " + keycloakId));
+    }
+
+    public PersonEntity findById(UUID id) {
+        return personRepository.findById(id)
+                .orElseThrow(() -> new PersonNotFoundException("Пользователь с таким id не найден: " + id));
+    }
+
+    public List<PersonEntity> findAll() {
+        return personRepository.findAll();
+    }
+
+    public void disablePerson(UUID id) {
+        var person = findById(id);
+        person.setDisabled(true);
+        save(person);
+    }
+
+    public PersonEntity update(PersonEntity person) {
+        return personRepository.save(person);
     }
 }
