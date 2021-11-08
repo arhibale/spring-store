@@ -18,7 +18,8 @@ public abstract class AbstractView extends VerticalLayout {
     private static final SimpleGrantedAuthority MANAGER_ROLE = new SimpleGrantedAuthority("manager");
 
     public AbstractView() {
-
+        setAlignItems(Alignment.CENTER);
+        setJustifyContentMode(JustifyContentMode.CENTER);
         Button logoutButton = new Button("Выйти", buttonClickEvent -> {
             SecurityContextHolder.clearContext();
             UI.getCurrent().navigate(LoginView.class);
@@ -26,16 +27,15 @@ public abstract class AbstractView extends VerticalLayout {
         Button mainPageButton = new Button("На главную", buttonClickEvent -> UI.getCurrent().navigate(MainView.class));
         Button toCartButton = new Button("Корзина", buttonClickEvent -> UI.getCurrent().navigate(""));
 
-        setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.CENTER);
-
-        var h1 = new HorizontalLayout(mainPageButton, logoutButton, toCartButton);
+        var h1 = new HorizontalLayout();
+        h1.add(mainPageButton, toCartButton);
         var adminButtons = initSpecialButtons();
         if (CollectionUtils.isNotEmpty(adminButtons)) {
             for (Button button : adminButtons) {
                 h1.add(button);
             }
         }
+        h1.add(logoutButton);
         add(h1);
     }
 

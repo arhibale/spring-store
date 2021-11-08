@@ -4,12 +4,15 @@ import com.arhibale.springstore.entity.ProductEntity;
 import com.arhibale.springstore.repository.filter.ProductFilter;
 import com.arhibale.springstore.service.ProductService;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -20,15 +23,15 @@ import com.vaadin.flow.router.Route;
 import java.util.HashMap;
 
 @Route("main")
-@PageTitle("Home")
+@PageTitle("Список продуктов")
 public class MainView extends AbstractView {
     private final Grid<ProductEntity> productGrid = new Grid<>(ProductEntity.class);
 
     private final ProductService productService;
 
-    private final TextField minPriceTextField = new TextField();
-    private final TextField maxPriceTextField = new TextField();
-    private final TextField nameTextField = new TextField();
+    private final IntegerField minPriceTextField = new IntegerField("Минимальная цена");
+    private final IntegerField maxPriceTextField = new IntegerField("Максимальная цена");
+    private final TextField nameTextField = new TextField("Наименование");
 
     public MainView(ProductService productService) {
         this.productService = productService;
@@ -39,33 +42,28 @@ public class MainView extends AbstractView {
     private void initPage() {
         initProductGrid();
 
-        add(productGrid, initFilterLayout(), initCartButton());
+        add(new H1("Список товаров"), productGrid, initCartButton(), initFilterLayout());
     }
 
     private Component initFilterLayout() {
-        var vl = new VerticalLayout();
-        vl.setAlignItems(Alignment.CENTER);
-        vl.setJustifyContentMode(JustifyContentMode.CENTER);
+        minPriceTextField.setHasControls(true);
+        minPriceTextField.setValue(1);
+        minPriceTextField.setMin(0);
 
-        minPriceTextField.setPlaceholder("Минимальная цена");
-        maxPriceTextField.setPlaceholder("Максимальная цена");
-        nameTextField.setPlaceholder("Наименование");
+        maxPriceTextField.setHasControls(true);
+        maxPriceTextField.setValue(1);
+        maxPriceTextField.setMin(0);
 
-        vl.add(minPriceTextField, maxPriceTextField, nameTextField);
-
-        return vl;
-    }
-
-    private HorizontalLayout initCartButton() {
-        var addToCardButton = new Button("Добавить в корзину", event -> {
-            //TODO: Сохранение в бд какому-либо пользователю
-            Notification.show("Товар успешно добавлен в корзину");
-        });
+        var formLayout = new FormLayout();
+        formLayout.add(minPriceTextField, maxPriceTextField, nameTextField);
+        formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("300px", 2));
+        formLayout.setColspan(nameTextField, 2);
+        formLayout.setMaxWidth(300f, Unit.PIXELS);
 
         var filterButton = new Button("Отфильтровать", event -> {
             var map = new HashMap<String, String>();
-            map.put("minPrice", minPriceTextField.getValue());
-            map.put("maxPrice", maxPriceTextField.getValue());
+            map.put("minPrice", minPriceTextField.getValue().toString());
+            map.put("maxPrice", maxPriceTextField.getValue().toString());
             map.put("name", nameTextField.getValue());
 
             var productFilter = new ProductFilter(map);
@@ -75,32 +73,40 @@ public class MainView extends AbstractView {
             productGrid.setDataProvider(dataProvider);
         });
 
-        return new HorizontalLayout(addToCardButton, filterButton);
+        var verticalLayout = new VerticalLayout();
+        verticalLayout.add(new HorizontalLayout(formLayout), filterButton);
+        verticalLayout.setAlignItems(Alignment.CENTER);
+        verticalLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        return verticalLayout;
+    }
+
+    private HorizontalLayout initCartButton() {
+        var addToCardButton = new Button("Добавить выбранное в корзину", event -> {
+            //TODO: Сохранение в бд какому-либо пользователю
+            Notification.show("Товар успешно добавлен в корзину");
+        });
+        return new HorizontalLayout(addToCardButton);
     }
 
     private void initProductGrid() {
         var products = productService.getAll();
 
         productGrid.setItems(products);
-        productGrid.setColumns("name", "price", "count", "vendorCode");
-        productGrid.setSizeUndefined();
+        productGrid.setColumns("name", "price", "vendorCode", "count");
         productGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-
-        ListDataProvider<ProductEntity> dataProvider = DataProvider.ofCollection(products);
-        productGrid.setDataProvider(dataProvider);
+        productGrid.setSizeUndefined();
 
         productGrid.addColumn(new ComponentRenderer<>(item -> {
-            var plusButton = new Button("+", i -> {
-                //productService.save(item);
-                productGrid.getDataProvider().refreshItem(item);
+            var countField = new IntegerField();
+            countField.setValue(1);
+            countField.setMin(1);
+            countField.setHasControls(true);
+            countField.setHelperText("Количество");
+            var addButton = new Button("В корзину", buttonClickEvent -> {
+                //TODO: Сохранение в бд какому-либо пользователю
             });
-
-            var minusButton = new Button("-", i -> {
-                //productService.save(item);
-                productGrid.getDataProvider().refreshItem(item);
-            });
-
-            return new HorizontalLayout(plusButton, minusButton);
+            return new HorizontalLayout(countField, addButton);
         }));
     }
 }

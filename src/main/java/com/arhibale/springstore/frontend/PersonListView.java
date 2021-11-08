@@ -11,12 +11,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route("person-list-view")
+@PageTitle("Список пользователей")
 public class PersonListView extends AbstractView {
     private final  PersonService personService;
-    private Grid<PersonEntity> personGrid = new Grid<>(PersonEntity.class);
+    private final Grid<PersonEntity> personGrid = new Grid<>(PersonEntity.class);
 
     public PersonListView(PersonService personService) {
         this.personService = personService;
@@ -30,7 +32,7 @@ public class PersonListView extends AbstractView {
         var person = personService.findAll();
 
         personGrid.setItems(person);
-        personGrid.setColumns("login", "lastName");
+        personGrid.setColumns("login", "firstName", "lastName", "phone", "email");
         personGrid.setSizeUndefined();
         personGrid.setSelectionMode(Grid.SelectionMode.MULTI);
 
