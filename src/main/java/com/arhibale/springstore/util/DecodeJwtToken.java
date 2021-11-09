@@ -18,13 +18,8 @@ public class DecodeJwtToken {
     public static String parsePayload() {
         var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String[] chunks = ((String) principal).split("\\.");
-        try {
-            return new String(Base64.getDecoder().decode(chunks[1]));
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            String encoded = chunks[1].replace("-", "/");
-            return new String(Base64.getDecoder().decode(encoded));
-        }
+        String encoded = chunks[1].replace("-", "/");
+        return new String(Base64.getDecoder().decode(encoded));
     }
 
     public static Object decodeByKey(String key) {

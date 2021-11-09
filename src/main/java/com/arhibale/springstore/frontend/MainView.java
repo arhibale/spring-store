@@ -1,7 +1,11 @@
 package com.arhibale.springstore.frontend;
 
+import com.arhibale.springstore.config.security.CustomUserDetails;
+import com.arhibale.springstore.entity.CartEntity;
+import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.entity.ProductEntity;
 import com.arhibale.springstore.repository.filter.ProductFilter;
+import com.arhibale.springstore.service.CartService;
 import com.arhibale.springstore.service.ProductService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
@@ -16,10 +20,12 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 @Route("main")
@@ -28,13 +34,17 @@ public class MainView extends AbstractView {
     private final Grid<ProductEntity> productGrid = new Grid<>(ProductEntity.class);
 
     private final ProductService productService;
+    private final CartService cartService;
 
     private final IntegerField minPriceTextField = new IntegerField("Минимальная цена");
     private final IntegerField maxPriceTextField = new IntegerField("Максимальная цена");
     private final TextField nameTextField = new TextField("Наименование");
 
-    public MainView(ProductService productService) {
+    private final PersonEntity person = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPerson();
+
+    public MainView(ProductService productService, CartService cartService) {
         this.productService = productService;
+        this.cartService = cartService;
 
         initPage();
     }
@@ -42,7 +52,7 @@ public class MainView extends AbstractView {
     private void initPage() {
         initProductGrid();
 
-        add(new H1("Список товаров"), productGrid, initCartButton(), initFilterLayout());
+        add(new H1("Список товаров"), productGrid, initFilterLayout());
     }
 
     private Component initFilterLayout() {
@@ -81,32 +91,50 @@ public class MainView extends AbstractView {
         return verticalLayout;
     }
 
-    private HorizontalLayout initCartButton() {
-        var addToCardButton = new Button("Добавить выбранное в корзину", event -> {
-            //TODO: Сохранение в бд какому-либо пользователю
-            Notification.show("Товар успешно добавлен в корзину");
-        });
-        return new HorizontalLayout(addToCardButton);
-    }
-
     private void initProductGrid() {
         var products = productService.getAll();
 
         productGrid.setItems(products);
-        productGrid.setColumns("name", "price", "vendorCode", "count");
-        productGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-        productGrid.setSizeUndefined();
+        productGrid.setColumns("name", "vendorCode", "price");
+        productGrid.addComponentColumn(this::createAddButton);
+        productGrid.setSelectionMode(Grid.SelectionMode.NONE);
+    }
 
-        productGrid.addColumn(new ComponentRenderer<>(item -> {
-            var countField = new IntegerField();
-            countField.setValue(1);
-            countField.setMin(1);
-            countField.setHasControls(true);
-            countField.setHelperText("Количество");
-            var addButton = new Button("В корзину", buttonClickEvent -> {
-                //TODO: Сохранение в бд какому-либо пользователю
-            });
-            return new HorizontalLayout(countField, addButton);
-        }));
+    private HorizontalLayout createAddButton(ProductEntity item) {
+        var countField = new IntegerField();
+        countField.setValue(1);
+        countField.setMin(1);
+        countField.setHasControls(true);
+        return new HorizontalLayout(countField, new Button("В корзину", buttonClickEvent -> addProductToTheCart(item, countField.getValue())));
+    }
+
+    private void addProductToTheCart(ProductEntity product, int count) {
+        var person = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPerson();
+        var cart = cartService.getCartByPersonId(person);
+        var productList = cart.getProducts();
+
+        if (CollectionUtils.isNotEmpty(productList)) {
+            for (CartEntity.InnerProduct inner : cart.getProducts()) {
+                if (inner.getId().equals(String.valueOf(product.getId()))) {
+                    inner.setCount(inner.getCount() + count);
+                    inner.setPrice(product.getPrice().multiply(new BigDecimal(inner.getCount())));
+
+                    cartService.save(cart);
+                    Notification.show("Товар добавлен!");
+                    return;
+                }
+            }
+        }
+
+        productList.add(new CartEntity.InnerProduct()
+                .setId(String.valueOf(product.getId()))
+                .setName(product.getName())
+                .setVendorCode(product.getVendorCode())
+                .setPrice(product.getPrice().multiply(new BigDecimal(count)))
+                .setCount(count));
+        cart.setProducts(productList);
+
+        cartService.save(cart);
+        Notification.show("Товар добавлен!");
     }
 }

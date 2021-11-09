@@ -1,6 +1,8 @@
 package com.arhibale.springstore.frontend;
 
+import com.arhibale.springstore.entity.CartEntity;
 import com.arhibale.springstore.entity.PersonEntity;
+import com.arhibale.springstore.service.CartService;
 import com.arhibale.springstore.service.PersonService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
@@ -18,14 +20,18 @@ import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import java.util.ArrayList;
+
 @Route("registration")
 @PageTitle("Регистрация")
 public class RegistrationView extends AbstractView {
 
     private final PersonService personService;
+    private final CartService cartService;
 
-    public RegistrationView(PersonService personService) {
+    public RegistrationView(PersonService personService, CartService cartService) {
         this.personService = personService;
+        this.cartService = cartService;
 
         initRegistrationView();
     }
@@ -99,6 +105,12 @@ public class RegistrationView extends AbstractView {
                 if (binder.writeBeanIfValid(person)) {
                     person.setRole("customer");
                     personService.save(person);
+
+                    var cart = new CartEntity();
+                    cart.setPersonId(person);
+                    cart.setProducts(new ArrayList<>());
+                    cartService.save(cart);
+
                     Notification.show("Регистрация прошла успешно!");
                     UI.getCurrent().navigate(LoginView.class);
                 } else {

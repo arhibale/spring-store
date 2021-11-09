@@ -25,7 +25,7 @@ public abstract class AbstractView extends VerticalLayout {
             UI.getCurrent().navigate(LoginView.class);
         });
         Button mainPageButton = new Button("На главную", buttonClickEvent -> UI.getCurrent().navigate(MainView.class));
-        Button toCartButton = new Button("Корзина", buttonClickEvent -> UI.getCurrent().navigate(""));
+        Button toCartButton = new Button("Корзина", buttonClickEvent -> UI.getCurrent().navigate(CartView.class));
 
         var h1 = new HorizontalLayout();
         h1.add(mainPageButton, toCartButton);

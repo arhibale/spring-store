@@ -34,7 +34,7 @@ public class PersonListView extends AbstractView {
         personGrid.setItems(person);
         personGrid.setColumns("login", "firstName", "lastName", "phone", "email");
         personGrid.setSizeUndefined();
-        personGrid.setSelectionMode(Grid.SelectionMode.MULTI);
+        personGrid.setSelectionMode(Grid.SelectionMode.NONE);
 
         ListDataProvider<PersonEntity> dataProvider = DataProvider.ofCollection(person);
         personGrid.setDataProvider(dataProvider);
