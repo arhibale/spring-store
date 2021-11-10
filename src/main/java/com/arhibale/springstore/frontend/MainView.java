@@ -2,7 +2,6 @@ package com.arhibale.springstore.frontend;
 
 import com.arhibale.springstore.config.security.CustomUserDetails;
 import com.arhibale.springstore.entity.CartEntity;
-import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.entity.ProductEntity;
 import com.arhibale.springstore.repository.filter.ProductFilter;
 import com.arhibale.springstore.service.CartService;
@@ -39,8 +38,6 @@ public class MainView extends AbstractView {
     private final IntegerField minPriceTextField = new IntegerField("Минимальная цена");
     private final IntegerField maxPriceTextField = new IntegerField("Максимальная цена");
     private final TextField nameTextField = new TextField("Наименование");
-
-    private final PersonEntity person = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPerson();
 
     public MainView(ProductService productService, CartService cartService) {
         this.productService = productService;
@@ -135,6 +132,6 @@ public class MainView extends AbstractView {
         cart.setProducts(productList);
 
         cartService.save(cart);
-        Notification.show("Товар добавлен!");
+        Notification.show("Новый товар добавлен!");
     }
 }

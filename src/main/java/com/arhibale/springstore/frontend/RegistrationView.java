@@ -3,6 +3,7 @@ package com.arhibale.springstore.frontend;
 import com.arhibale.springstore.entity.CartEntity;
 import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.service.CartService;
+import com.arhibale.springstore.service.OrderService;
 import com.arhibale.springstore.service.PersonService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
@@ -28,10 +29,12 @@ public class RegistrationView extends AbstractView {
 
     private final PersonService personService;
     private final CartService cartService;
+    private final OrderService orderService;
 
-    public RegistrationView(PersonService personService, CartService cartService) {
+    public RegistrationView(PersonService personService, CartService cartService, OrderService orderService) {
         this.personService = personService;
         this.cartService = cartService;
+        this.orderService = orderService;
 
         initRegistrationView();
     }

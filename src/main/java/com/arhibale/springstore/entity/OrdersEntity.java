@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order")
-public class OrderEntity {
+@Table(name = "orders")
+public class OrdersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -38,7 +38,7 @@ public class OrderEntity {
         return id;
     }
 
-    public OrderEntity setId(Integer id) {
+    public OrdersEntity setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -47,7 +47,7 @@ public class OrderEntity {
         return cartId;
     }
 
-    public OrderEntity setCartId(CartEntity cartId) {
+    public OrdersEntity setCartId(CartEntity cartId) {
         this.cartId = cartId;
         return this;
     }
@@ -56,7 +56,7 @@ public class OrderEntity {
         return cost;
     }
 
-    public OrderEntity setCost(BigDecimal cost) {
+    public OrdersEntity setCost(BigDecimal cost) {
         this.cost = cost;
         return this;
     }
@@ -65,7 +65,7 @@ public class OrderEntity {
         return personId;
     }
 
-    public OrderEntity setPersonId(PersonEntity personId) {
+    public OrdersEntity setPersonId(PersonEntity personId) {
         this.personId = personId;
         return this;
     }
@@ -74,7 +74,7 @@ public class OrderEntity {
         return address;
     }
 
-    public OrderEntity setAddress(String address) {
+    public OrdersEntity setAddress(String address) {
         this.address = address;
         return this;
     }
@@ -83,7 +83,7 @@ public class OrderEntity {
         return createdAt;
     }
 
-    public OrderEntity setCreatedAt(LocalDateTime createdAt) {
+    public OrdersEntity setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }
