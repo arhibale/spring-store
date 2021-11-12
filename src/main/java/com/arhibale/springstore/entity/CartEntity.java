@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +30,9 @@ public class CartEntity {
     @Type(type = "jsonb")
     @Column(name = "products")
     private List<InnerProduct> products;
+
+    @OneToOne
+    private OrdersEntity orders;
 
     @PrePersist
     public void init() {
@@ -71,6 +75,40 @@ public class CartEntity {
 
     public CartEntity setProducts(List<InnerProduct> products) {
         this.products = products;
+        return this;
+    }
+
+    public CartEntity addProduct(InnerProduct product) {
+        if (this.products == null) {
+            this.products = new ArrayList<>();
+        }
+
+        for (InnerProduct innerProduct: this.products) {
+            if (innerProduct.getId().equals(product.getId())) {
+                innerProduct.setCount(innerProduct.getCount() + product.getCount());
+                innerProduct.setPrice(innerProduct.getPrice().add(product.getPrice()));
+                return this;
+            }
+        }
+
+        this.products.add(product);
+        return this;
+    }
+
+    public CartEntity addProducts(List<InnerProduct> products) {
+        if (this.products == null) {
+            this.products = new ArrayList<>();
+        }
+        this.products.addAll(products);
+        return this;
+    }
+
+    public OrdersEntity getOrders() {
+        return orders;
+    }
+
+    public CartEntity setOrders(OrdersEntity orders) {
+        this.orders = orders;
         return this;
     }
 

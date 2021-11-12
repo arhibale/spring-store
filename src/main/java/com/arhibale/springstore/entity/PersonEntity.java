@@ -1,7 +1,6 @@
 package com.arhibale.springstore.entity;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -26,12 +25,6 @@ public class PersonEntity {
 
     @Column(name = "address", length = 1024)
     private String address;
-
-    @Column(name = "balance", length = 20)
-    private BigDecimal balance;
-
-    @Column(name = "role", length = 16)
-    private String role;
 
     @Column(name = "email", length = 256, nullable = false, unique = true)
     private String email;
@@ -110,24 +103,6 @@ public class PersonEntity {
 
     public PersonEntity setAddress(String address) {
         this.address = address;
-        return this;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public PersonEntity setBalance(BigDecimal balance) {
-        this.balance = balance;
-        return this;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public PersonEntity setRole(String role) {
-        this.role = role;
         return this;
     }
 

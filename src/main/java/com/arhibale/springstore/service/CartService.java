@@ -5,7 +5,7 @@ import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.repository.CartRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 public class CartService {
@@ -15,8 +15,8 @@ public class CartService {
         this.cartRepository = cartRepository;
     }
 
-    public CartEntity getCartByPersonId(PersonEntity personId) {
-        return cartRepository.getCartEntityByPersonId(personId);
+    public Optional<CartEntity> findLastCart(PersonEntity person) {
+        return cartRepository.findByCartByPerson(person);
     }
 
     public CartEntity save(CartEntity cart) {

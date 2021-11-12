@@ -12,7 +12,7 @@ public class OrdersEntity {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "cart_id", nullable = false)
     private CartEntity cartId;
 

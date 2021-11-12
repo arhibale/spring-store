@@ -1,100 +1,115 @@
 package com.arhibale.springstore.frontend;
 
-import com.arhibale.springstore.config.security.CustomUserDetails;
 import com.arhibale.springstore.entity.CartEntity;
 import com.arhibale.springstore.entity.OrdersEntity;
 import com.arhibale.springstore.service.CartService;
-import com.arhibale.springstore.service.MailService;
 import com.arhibale.springstore.service.OrderService;
+import com.arhibale.springstore.util.PersonUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.security.GeneralSecurityException;
-import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Route("cart")
 @PageTitle("Корзина")
 public class CartView extends AbstractView {
-    private final Grid<CartEntity.InnerProduct> cartGrid = new Grid<>(CartEntity.InnerProduct.class);
+    private final Grid<CartEntity.InnerProduct> innerProductGrid = new Grid<>(CartEntity.InnerProduct.class);
 
     private final CartService cartService;
     private final OrderService orderService;
-    private final MailService mailService;
 
-    public CartView(CartService cartService, OrderService orderService, MailService mailService) {
+    private final CartEntity cart;
+
+    public CartView(CartService cartService, OrderService orderService) {
         this.cartService = cartService;
         this.orderService = orderService;
-        this.mailService = mailService;
 
-        initPage();
+        this.cart = cartService.findLastCart(PersonUtil.getCurrentPerson()).orElse(null);
+
+        initCartView();
     }
 
-    /*
-    1) Создать кнопку "Создать заказ" на странице "Корзина"
-    2) Создается сущность Order и отправляется письмо на почту с информацией о заказе
-    3) Создать страницу "Мои заказы" с доступом по всему приложению(AbstractView)
-     */
+    private void initCartView() {
+        if (cart != null) {
+            if (CollectionUtils.isNotEmpty(cart.getProducts())) {
+                innerProductGrid.setSelectionMode(Grid.SelectionMode.NONE);
+                innerProductGrid.setSizeUndefined();
+                innerProductGrid.setColumns("name", "vendorCode", "price", "count");
+                innerProductGrid.setItems(cart.getProducts());
 
-    private void initPage() {
-        var person = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPerson();
-        var cart = cartService.getCartByPersonId(person);
+                ListDataProvider<CartEntity.InnerProduct> dataProvider = DataProvider.ofCollection(cart.getProducts());
+                innerProductGrid.setDataProvider(dataProvider);
 
-        if (CollectionUtils.isNotEmpty(cart.getProducts())) {
-            cartGrid.setItems(cart.getProducts());
-            cartGrid.setColumns("name", "vendorCode", "price", "count");
-            cartGrid.setSizeUndefined();
-            cartGrid.setSelectionMode(Grid.SelectionMode.NONE);
+                innerProductGrid.addComponentColumn(this::createDeleteButton);
 
-            Button createOrderButton = new Button("Оформить заказ", buttonClickEvent -> {
-                var order = new OrdersEntity();
-                order.setCartId(cart);
-                order.setCost(getCostByProducts(cart.getProducts()));
-                order.setPersonId(person);
-                order.setAddress(person.getAddress());
-                orderService.save(order);
+                var initOrderButton = new Button("Создать заказ", buttonClickEvent -> {
+                    var order = new OrdersEntity()
+                            .setCartId(cart)
+                            .setAddress(Objects.requireNonNull(PersonUtil.getCurrentPerson()).getAddress())
+                            .setCost(calculateCost())
+                            .setPersonId(PersonUtil.getCurrentPerson());
 
-                try {
-                    mailService.sendMail(person, getCart(cart));
-                    Notification.show("Заказ оформлен! Письмо отправленно на почту!");
-                } catch (GeneralSecurityException | MessagingException | IOException e) {
-                    e.printStackTrace();
-                }
-            });
+                    order = orderService.save(order);
+                    cart.setOrders(order);
+                    cartService.save(cart);
+                    Notification.show("Заказ успешно оформлен!");
+                    reloadPage();
+                });
 
-            add(new H1("Корзина"), cartGrid, createOrderButton);
+                add(new H1("Корзина"), innerProductGrid, initOrderButton);
+            } else {
+                emptyCart();
+            }
         } else {
-            add(new H1("В корзине пусто!"));
+            emptyCart();
         }
     }
 
-    private BigDecimal getCostByProducts(List<CartEntity.InnerProduct> products) {
-        var cost = new BigDecimal("0");
-        for (CartEntity.InnerProduct product: products) {
-            cost = cost.add(product.getPrice());
+    private void reloadPage() {
+        UI.getCurrent().getPage().reload();
+    }
+
+    private void emptyCart() {
+        add(new H1("В корзине пусто!"));
+    }
+
+    private BigDecimal calculateCost() {
+        var cost = BigDecimal.ZERO;
+        for (CartEntity.InnerProduct innerProduct : cart.getProducts()) {
+            cost = cost.add(innerProduct.getPrice());
         }
         return cost;
     }
 
-    private String getCart(CartEntity cartId) {
-        var builder = new StringBuilder();
-        var products = cartId.getProducts();
+    private HorizontalLayout createDeleteButton(CartEntity.InnerProduct product) {
+        //todo cart count!
+        var countField = new IntegerField();
+        countField.setValue(1);
+        countField.setMin(1);
+        countField.setHasControls(true);
+        return new HorizontalLayout(countField, new Button("Удалить", buttonClickEvent -> deleteProductToTheCart(product)));
+    }
 
-        for (CartEntity.InnerProduct product: products) {
-            builder.append("Название: ").append(product.getName())
-                    .append(" Цена: ").append(product.getPrice())
-                    .append(" Количество: ").append(product.getCount())
-                    .append("\n");
-        }
-
-        return builder.toString();
+    private void deleteProductToTheCart(CartEntity.InnerProduct product) {
+        var products = cart.getProducts()
+                .stream()
+                .filter(p -> !p.getId().equals(product.getId()))
+                .collect(Collectors.toList());
+        cart.setProducts(products);
+        cartService.save(cart);
+        Notification.show("Продукт убран из корзины!");
+        reloadPage();
     }
 }

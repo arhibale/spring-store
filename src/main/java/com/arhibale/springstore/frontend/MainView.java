@@ -6,6 +6,7 @@ import com.arhibale.springstore.entity.ProductEntity;
 import com.arhibale.springstore.repository.filter.ProductFilter;
 import com.arhibale.springstore.service.CartService;
 import com.arhibale.springstore.service.ProductService;
+import com.arhibale.springstore.util.PersonUtil;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 
 @Route("main")
 @PageTitle("Список продуктов")
@@ -106,32 +108,23 @@ public class MainView extends AbstractView {
     }
 
     private void addProductToTheCart(ProductEntity product, int count) {
-        var person = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getPerson();
-        var cart = cartService.getCartByPersonId(person);
-        var productList = cart.getProducts();
-
-        if (CollectionUtils.isNotEmpty(productList)) {
-            for (CartEntity.InnerProduct inner : cart.getProducts()) {
-                if (inner.getId().equals(String.valueOf(product.getId()))) {
-                    inner.setCount(inner.getCount() + count);
-                    inner.setPrice(product.getPrice().multiply(new BigDecimal(inner.getCount())));
-
-                    cartService.save(cart);
-                    Notification.show("Товар добавлен!");
-                    return;
-                }
-            }
-        }
-
-        productList.add(new CartEntity.InnerProduct()
-                .setId(String.valueOf(product.getId()))
-                .setName(product.getName())
-                .setVendorCode(product.getVendorCode())
+        var innerProduct = new CartEntity.InnerProduct()
+                .setId(product.getId().toString())
                 .setPrice(product.getPrice().multiply(new BigDecimal(count)))
-                .setCount(count));
-        cart.setProducts(productList);
-
+                .setName(product.getName())
+                .setCount(count)
+                .setVendorCode(product.getVendorCode());
+        var cartOptional = cartService.findLastCart(PersonUtil.getCurrentPerson());
+        CartEntity cart;
+        if (cartOptional.isPresent()) {
+            cart = cartOptional.get();
+            cart.addProduct(innerProduct);
+        } else {
+            cart = new CartEntity()
+                    .setPersonId(PersonUtil.getCurrentPerson())
+                    .setProducts(List.of(innerProduct));
+        }
         cartService.save(cart);
-        Notification.show("Новый товар добавлен!");
+        Notification.show("Продукт добавлен в корзину!");
     }
 }

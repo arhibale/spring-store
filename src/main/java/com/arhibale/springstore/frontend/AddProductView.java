@@ -33,19 +33,15 @@ public class AddProductView extends AbstractView {
         var nameTextField = new TextField("Имя продукта");
         var vendorCodeTextField = new TextField("Артикул");
 
-        var countTextField = new IntegerField("Количество");
-        countTextField.setHasControls(true);
-        countTextField.setMin(1);
-        countTextField.setValue(1);
-
         var priceTextField = new BigDecimalField("Цена продукта");
         var rubPrefix = new Div();
         rubPrefix.setText("₽");
         priceTextField.setPrefixComponent(rubPrefix);
 
         var formLayout = new FormLayout();
-        formLayout.add(nameTextField, vendorCodeTextField, priceTextField, countTextField);
+        formLayout.add(nameTextField, vendorCodeTextField, priceTextField);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("400px", 2));
+        formLayout.setColspan(nameTextField, 2);
         formLayout.setMaxWidth(500f, Unit.PIXELS);
 
         SerializablePredicate<String> predicate = value ->
@@ -64,14 +60,12 @@ public class AddProductView extends AbstractView {
         binder.forField(priceTextField)
                 .withValidator(price -> price.intValue() > 0, "Цена не может быть отрицательно или равна нулю!")
                 .bind(ProductEntity::getPrice, ProductEntity::setPrice);
-        binder.forField(countTextField)
-                .withValidator(count -> count > 0, "Количество не может быть отрицательным или равно нулю!")
-                .bind(ProductEntity::getCount, ProductEntity::setCount);
 
         var createProductButton = new Button("Создать", buttonClickEvent -> {
             try {
                 var product = new ProductEntity();
                 if (binder.writeBeanIfValid(product)) {
+                    product.setCount(1);
                     productService.save(product);
                     Notification.show("Продукт создан!");
                     UI.getCurrent().navigate(MainView.class);

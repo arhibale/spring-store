@@ -20,8 +20,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="address" type="varchar(1024)"/>
-            <column name="balance" type="varchar(20)"/>
-            <column name="role" type="varchar(16)"/>
             <column name="email" type="varchar(256)">
                 <constraints unique="true" nullable="false"/>
             </column>
@@ -29,18 +27,6 @@
                 <constraints unique="true" nullable="false"/>
             </column>
             <column name="password" type="varchar(256)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="timestamp without timezone">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        
-        <createTable tableName="category">
-            <column name="id" type="int" autoIncrement="true">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(64)">
                 <constraints nullable="false"/>
             </column>
             <column name="created_at" type="timestamp without timezone">
@@ -118,5 +104,13 @@
 
     <changeSet id="price-to-mumeric" author="arhibale">
         <modifyDataType tableName="product" columnName="price" newDataType="numeric(10,2)"/>
+    </changeSet>
+
+    <changeSet id="add-order-id-to-cart" author="arhibale">
+        <addColumn tableName="cart">
+            <column name="orders_id" type="int">
+                <constraints foreignKeyName="orders_id" references="orders(id)"/>
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
