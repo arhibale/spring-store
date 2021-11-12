@@ -5,6 +5,7 @@ import com.arhibale.springstore.entity.OrdersEntity;
 import com.arhibale.springstore.service.CartService;
 import com.arhibale.springstore.service.OrderService;
 import com.arhibale.springstore.util.PersonUtil;
+import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -64,6 +65,7 @@ public class CartView extends AbstractView {
                     order = orderService.save(order);
                     cart.setOrders(order);
                     cartService.save(cart);
+
                     Notification.show("Заказ успешно оформлен!");
                     reloadPage();
                 });
@@ -94,11 +96,16 @@ public class CartView extends AbstractView {
     }
 
     private HorizontalLayout createDeleteButton(CartEntity.InnerProduct product) {
-        //todo cart count!
         var countField = new IntegerField();
         countField.setValue(1);
         countField.setMin(1);
         countField.setHasControls(true);
+
+        countField.addValueChangeListener(event -> {
+            product.setCount(event.getValue());
+            innerProductGrid.getDataProvider().refreshItem(product);
+        });
+
         return new HorizontalLayout(countField, new Button("Удалить", buttonClickEvent -> deleteProductToTheCart(product)));
     }
 

@@ -1,6 +1,5 @@
 package com.arhibale.springstore.frontend;
 
-import com.arhibale.springstore.config.security.CustomUserDetails;
 import com.arhibale.springstore.entity.CartEntity;
 import com.arhibale.springstore.entity.ProductEntity;
 import com.arhibale.springstore.repository.filter.ProductFilter;
@@ -22,8 +21,6 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

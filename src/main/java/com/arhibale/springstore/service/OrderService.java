@@ -2,6 +2,7 @@ package com.arhibale.springstore.service;
 
 import com.arhibale.springstore.entity.CartEntity;
 import com.arhibale.springstore.entity.OrdersEntity;
+import com.arhibale.springstore.entity.PersonEntity;
 import com.arhibale.springstore.repository.OrderRepository;
 import com.arhibale.springstore.util.PersonUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -53,5 +54,9 @@ public class OrderService {
         }
         stringBuilder.append("ИТОГОВАЯ ЦЕНА: ").append(cost);
         return stringBuilder.toString();
+    }
+
+    public List<OrdersEntity> getOrdersByPersonId(PersonEntity currentPerson) {
+        return orderRepository.findOrdersEntitiesByPersonId(currentPerson);
     }
 }
