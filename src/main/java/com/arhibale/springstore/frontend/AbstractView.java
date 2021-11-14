@@ -1,32 +1,31 @@
 package com.arhibale.springstore.frontend;
 
-import com.arhibale.springstore.config.security.CustomUserDetails;
+import com.arhibale.springstore.util.PersonUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractView extends VerticalLayout {
-    private static final SimpleGrantedAuthority ADMIN_ROLE = new SimpleGrantedAuthority("admin");
-    private static final SimpleGrantedAuthority SELLER_ROLE = new SimpleGrantedAuthority("seller");
-    private static final SimpleGrantedAuthority MANAGER_ROLE = new SimpleGrantedAuthority("manager");
+    private static final String ADMIN_ROLE = "admin";
+    private static final String SELLER_ROLE = "seller";
+    private static final String MANAGER_ROLE = "manager";
 
     public AbstractView() {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
-        Button logoutButton = new Button("Выйти", buttonClickEvent -> {
+        var logoutButton = new Button("Выйти", buttonClickEvent -> {
             SecurityContextHolder.clearContext();
             UI.getCurrent().navigate(LoginView.class);
         });
-        Button mainPageButton = new Button("На главную", buttonClickEvent -> UI.getCurrent().navigate(MainView.class));
-        Button toOrdersButton = new Button("Мои заказы", buttonClickEvent -> UI.getCurrent().navigate(OrderView.class));
-        Button toCartButton = new Button("Корзина", buttonClickEvent -> UI.getCurrent().navigate(CartView.class));
+        var mainPageButton = new Button("На главную", buttonClickEvent -> UI.getCurrent().navigate(MainView.class));
+        var toOrdersButton = new Button("Мои заказы", buttonClickEvent -> UI.getCurrent().navigate(OrderView.class));
+        var toCartButton = new Button("Корзина", buttonClickEvent -> UI.getCurrent().navigate(CartView.class));
 
         var h1 = new HorizontalLayout();
         h1.add(mainPageButton, toOrdersButton, toCartButton);
@@ -41,18 +40,15 @@ public abstract class AbstractView extends VerticalLayout {
     }
 
     private List<Button> initSpecialButtons() {
-        var details = SecurityContextHolder.getContext().getAuthentication().getDetails();
         var buttons = new ArrayList<Button>();
 
-        if (details instanceof CustomUserDetails) {
-            if (((CustomUserDetails) details).getAuthorities().contains(ADMIN_ROLE)) {
-                buttons.add(new Button("Список пользователей", buttonClickEvent -> UI.getCurrent().navigate(PersonListView.class)));
-            }
-            var detail = ((CustomUserDetails) details).getAuthorities();
-            if (detail.contains(ADMIN_ROLE) || detail.contains(SELLER_ROLE) || detail.contains(MANAGER_ROLE)) {
-                buttons.add(new Button("Добавить товар", buttonClickEvent -> UI.getCurrent().navigate(AddProductView.class)));
-            }
+        if (PersonUtil.isRole(ADMIN_ROLE)) {
+            buttons.add(new Button("Список пользователей", buttonClickEvent -> UI.getCurrent().navigate(PersonListView.class)));
         }
+        if (PersonUtil.isRole(ADMIN_ROLE) || PersonUtil.isRole(SELLER_ROLE) || PersonUtil.isRole(MANAGER_ROLE)) {
+            buttons.add(new Button("Добавить товар", buttonClickEvent -> UI.getCurrent().navigate(AddProductView.class)));
+        }
+
         return buttons;
     }
 }

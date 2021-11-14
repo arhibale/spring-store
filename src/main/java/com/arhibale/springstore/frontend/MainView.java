@@ -7,6 +7,7 @@ import com.arhibale.springstore.service.CartService;
 import com.arhibale.springstore.service.ProductService;
 import com.arhibale.springstore.util.PersonUtil;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -20,11 +21,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Route("main")
 @PageTitle("Список продуктов")
@@ -33,10 +37,6 @@ public class MainView extends AbstractView {
 
     private final ProductService productService;
     private final CartService cartService;
-
-    private final IntegerField minPriceTextField = new IntegerField("Минимальная цена");
-    private final IntegerField maxPriceTextField = new IntegerField("Максимальная цена");
-    private final TextField nameTextField = new TextField("Наименование");
 
     public MainView(ProductService productService, CartService cartService) {
         this.productService = productService;
@@ -52,6 +52,10 @@ public class MainView extends AbstractView {
     }
 
     private Component initFilterLayout() {
+        var minPriceTextField = new IntegerField("Минимальная цена");
+        var maxPriceTextField = new IntegerField("Максимальная цена");
+        var nameTextField = new TextField("Наименование");
+
         minPriceTextField.setHasControls(true);
         minPriceTextField.setValue(1);
         minPriceTextField.setMin(0);
@@ -92,16 +96,23 @@ public class MainView extends AbstractView {
 
         productGrid.setItems(products);
         productGrid.setColumns("name", "vendorCode", "price");
-        productGrid.addComponentColumn(this::createAddButton);
+        productGrid.addComponentColumn(this::createButton);
         productGrid.setSelectionMode(Grid.SelectionMode.NONE);
     }
 
-    private HorizontalLayout createAddButton(ProductEntity item) {
+    private HorizontalLayout createButton(ProductEntity product) {
         var countField = new IntegerField();
         countField.setValue(1);
         countField.setMin(1);
         countField.setHasControls(true);
-        return new HorizontalLayout(countField, new Button("В корзину", buttonClickEvent -> addProductToTheCart(item, countField.getValue())));
+        return new HorizontalLayout(countField,
+                new Button("В корзину", buttonClickEvent -> addProductToTheCart(product, countField.getValue())),
+                new Button("Открыть отзывы", buttonClickEvent -> {
+                    Map<String, List<String>> queryParams = new HashMap<>();
+                    queryParams.put("product", List.of(product.getId().toString()));
+                    var queryParameters = new QueryParameters(queryParams);
+                    UI.getCurrent().navigate("review", queryParameters);
+                }));
     }
 
     private void addProductToTheCart(ProductEntity product, int count) {

@@ -113,4 +113,30 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="add-review-table" author="arhibale">
+        <createTable tableName="review">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="product_id" type="uuid">
+                <constraints nullable="false" references="product(id)" foreignKeyName="product_id"/>
+            </column>
+            <column name="person_id" type="uuid">
+                <constraints nullable="false" references="person(id)" foreignKeyName="person_id"/>
+            </column>
+            <column name="score" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="review" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp without timezone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_moderated" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
